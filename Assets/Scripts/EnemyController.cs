@@ -15,7 +15,7 @@ public class EnemyController : MonoBehaviour
     int direction = 1;
 
     Animator anim;
-    // Start is called before the first frame update
+    bool broken = true;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -26,28 +26,39 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!broken) return;
         timer -= Time.deltaTime;
-        if(timer < 0){
+        if (timer < 0)
+        {
             direction = -direction;
             timer = changeTime;
         }
         Vector2 pos = rb.position;
-        if(isVertical){
-            pos.y = pos.y + Time.deltaTime * speed *direction;
-            anim.SetFloat("Movex",0);
-            anim.SetFloat("MoveY",direction);
-        }else{
+        if (isVertical)
+        {
+            pos.y = pos.y + Time.deltaTime * speed * direction;
+            anim.SetFloat("MoveX", 0);
+            anim.SetFloat("MoveY", direction);
+        }
+        else
+        {
             pos.x = pos.x + Time.deltaTime * speed * direction;
-            anim.SetFloat("MoveX",direction);
-            anim.SetFloat("MoveY",0);
+            anim.SetFloat("MoveX", direction);
+            anim.SetFloat("MoveY", 0);
         }
         rb.MovePosition(pos);
     }
     void OnCollisionEnter2D(Collision2D other)
     {
         RubyController rubyCon = other.gameObject.GetComponent<RubyController>();
-        if(rubyCon != null){
+        if (rubyCon != null)
+        {
             rubyCon.ChangeHealth(-1);
         }
+    }
+    public void Fix(){
+        broken = false;
+        rb.simulated = false;
+        anim.SetTrigger("Fixed");
     }
 }
